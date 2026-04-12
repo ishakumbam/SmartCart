@@ -1,0 +1,38 @@
+# Dependencies
+**/node_modules/
+
+# Environment and secrets (never commit real API keys)
+.env
+.env.*
+!.env.example
+server/.env
+server/.env.*
+!server/.env.example
+
+# Keys and credentials
+*.pem
+*.p12
+**/keys/
+**/google-service-account.json
+**/google-services.json
+**/GoogleService-Info.plist
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Build / logs
+dist/
+build/
+*.log
+npm-debug.log*
+
+# Expo
+.expo/
+web-build/
+
+# Metro / React Native
+*.jks
+*.keystore

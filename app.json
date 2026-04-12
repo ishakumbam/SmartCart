@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "SmartCart",
+    "slug": "smartcart",
+    "version": "0.1.0",
+    "scheme": "smartcart",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "infoPlist": {
+        "NSCameraUsageDescription": "SmartCart uses the camera to photograph receipts for savings insights.",
+        "NSPhotoLibraryUsageDescription": "SmartCart accesses your photos to upload receipt images.",
+        "NSLocationWhenInUseUsageDescription": "SmartCart uses your location to show nearby deals."
+      }
+    },
+    "android": {
+      "permissions": ["CAMERA", "READ_MEDIA_IMAGES", "ACCESS_FINE_LOCATION"]
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}

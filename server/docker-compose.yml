@@ -1,0 +1,18 @@
+# Local Postgres for SmartCart (avoids Homebrew auth / wrong password issues).
+# Start:  docker compose up -d
+# Stop:   docker compose down
+# Then set DATABASE_URL to use port 5433 (see comment in .env.example flow below).
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: smartcart
+    ports:
+      - '5433:5432'
+    volumes:
+      - smartcart_pgdata:/var/lib/postgresql/data
+
+volumes:
+  smartcart_pgdata:

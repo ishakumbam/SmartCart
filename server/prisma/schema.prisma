@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+}
+
+enum ReceiptStatus {
+  PENDING
+  PROCESSING
+  PROCESSED
+  FAILED
+}
+
+enum ItemCategory {
+  DAIRY
+  PRODUCE
+  BAKERY
+  MEAT
+  SEAFOOD
+  FROZEN
+  BEVERAGES
+  SNACKS
+  CEREAL
+  CANNED_GOODS
+  CONDIMENTS
+  SPICES
+  OILS
+  PASTA
+  RICE
+  BEANS
+  NUTS
+  COFFEE
+  TEA
+  JUICE
+  SODA
+  WATER
+  CLEANING
+  PERSONAL_CARE
+  BABY
+  PET
+  DELI
+  PREPARED_FOODS
+  ORGANIC
+  OTHER
+}
+
+model User {
+  id            String       @id @default(cuid())
+  email         String       @unique
+  passwordHash  String?
+  name          String
+  provider      AuthProvider
+  expoPushToken String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  receipts      Receipt[]
+  receiptItems  ReceiptItem[]
+  buyProfiles   BuyProfile[]
+  dealClicks    DealClick[]
+  notifications Notification[]
+}
+
+model Receipt {
+  id           String        @id @default(cuid())
+  userId       String
+  s3Url        String
+  rawText      String?
+  status       ReceiptStatus @default(PENDING)
+  storeName    String?
+  purchaseDate DateTime?
+  totalAmount  Float?
+  createdAt    DateTime      @default(now())
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items        ReceiptItem[]
+}
+
+model ReceiptItem {
+  id            String       @id @default(cuid())
+  receiptId     String
+  userId        String
+  rawName       String
+  canonicalName String
+  category      ItemCategory
+  price         Float
+  quantity      Int
+  unit          String?
+  receipt       Receipt      @relation(fields: [receiptId], references: [id], onDelete: Cascade)
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model BuyProfile {
+  id             String       @id @default(cuid())
+  userId         String
+  canonicalItem  String
+  category       ItemCategory
+  frequencyScore Float
+  totalPurchases Int
+  lastPurchased  DateTime
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, canonicalItem])
+}
+
+model Deal {
+  id           String     @id @default(cuid())
+  flippId      String     @unique
+  storeName    String
+  storeAddress String
+  lat          Float
+  lng          Float
+  canonicalItem String
+  category     ItemCategory
+  regularPrice Float
+  salePrice    Float
+  savingsPct   Float
+  affiliateUrl String
+  imageUrl     String?
+  expiresAt    DateTime
+  createdAt    DateTime   @default(now())
+  clicks       DealClick[]
+  notifications Notification[]
+}
+
+model DealClick {
+  id           String   @id @default(cuid())
+  userId       String
+  dealId       String
+  affiliateUrl String
+  clickedAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deal         Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  body      String
+  dealId    String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deal      Deal?    @relation(fields: [dealId], references: [id], onDelete: SetNull)
+}
