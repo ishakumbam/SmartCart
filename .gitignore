@@ -32,6 +32,7 @@ npm-debug.log*
 # Expo
 .expo/
 web-build/
+dist-web/
 
 # Metro / React Native
 *.jks

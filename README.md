@@ -1,6 +1,6 @@
 # SmartCart
 
-SmartCart is a **grocery savings** product: an **Expo (React Native)** mobile app talks to a **Node.js / Express** API backed by **PostgreSQL**, **Redis**, and **S3-compatible storage** (e.g. AWS S3 or Cloudflare R2). The backend ingests **receipt images**, runs **OCR**, builds **buying profiles**, **ranks local deals** (including Flipp-sourced offers when configured), and exposes **habits** and **notifications**.
+SmartCart is a **grocery savings** product: an **Expo (React Native)** mobile app (primary) talks to a **Node.js / Express** API backed by **PostgreSQL**, **Redis**, and **S3-compatible storage** (e.g. AWS S3 or Cloudflare R2). The backend ingests **receipt images**, runs **OCR**, builds **buying profiles**, **ranks local deals** (including Flipp-sourced offers when configured), and exposes **habits** and **notifications**.
 
 ---
 
@@ -13,7 +13,7 @@ SmartCart is a **grocery savings** product: an **Expo (React Native)** mobile ap
 | **PostgreSQL** | Users, deals, receipts, receipt line items, buy profiles, deal clicks, notifications — via **Prisma**. |
 | **Redis** | **BullMQ** job queues (e.g. receipt processing, Flipp/cron-related work). |
 | **Object storage** | Receipt images uploaded with **presigned PUT** URLs; processing reads from the stored URL. |
-| **Google Cloud Vision** (optional path) | OCR / vision used in the receipt pipeline when configured (`GOOGLE_APPLICATION_CREDENTIALS`). |
+| **OCR** | **Default (free):** [Tesseract.js](https://github.com/naptha/tesseract.js) runs on your server — no Google bill. Optional: [Google Cloud Vision](https://cloud.google.com/vision) if you set `GOOGLE_APPLICATION_CREDENTIALS`. Control with **`OCR_ENGINE`**: `auto` (Vision when creds exist, else Tesseract), `google`, or `tesseract`. The worker parses lines into `ReceiptItem` rows and **updates `BuyProfile`**; Home **deal ranking** uses those profiles. |
 
 ---
 
@@ -34,6 +34,8 @@ SmartCart/
 │   │   └── workers/        # receipt worker, Flipp cron, notifications
 │   ├── docker-compose.yml  # optional local Postgres (see below)
 │   └── .env.example        # copy to .env — never commit real secrets
+├── capacitor.config.ts     # Optional: [Capacitor](https://capacitorjs.com/) wraps the **web** export (`dist/`)
+├── ios/                     # Optional: native shell (after `npx cap add ios` + `npm run build:web` + `npx cap sync`)
 ├── package.json            # Expo app scripts
 └── server/package.json     # API scripts
 ```
@@ -81,6 +83,14 @@ Ensure Redis is reachable at **`REDIS_HOST`** / **`REDIS_PORT`** (defaults often
 
 ---
 
+## Receipt scanning (camera → trends → deals)
+
+1. **App:** **Scan** tab → live **camera** (`expo-camera`) or **Photos** upload → JPEG → presigned URL → `POST /api/receipts` → BullMQ worker.
+2. **Server:** Worker runs OCR → `parseReceiptItems` → saves items → **`updateBuyProfiles`** (frequency scores).
+3. **`GET /api/deals`** uses **`getRankedDeals`**: matches deal `canonicalItem` to profile items and mixes in savings + how often you buy that item; with no profiles yet, it falls back to nearby high-save deals.
+
+Without **Postgres + Redis + S3/R2** and a working OCR path (**Tesseract by default**, or Vision if configured), scans can fail or stay **PROCESSING** / **FAILED**. First Tesseract run may download English models (~internet once). Use a well-lit, flat receipt; line items need prices like `1.99` on each line for the parser.
+
 ## Mobile app setup
 
 ```bash
@@ -106,6 +116,34 @@ npm start
 ```
 
 Run the **API** and **Expo** at the same time in separate terminals for full flows (auth, deals, uploads).
+
+### Capacitor (optional — not a replacement for Expo native)
+
+**Capacitor** ships a **static website** inside a native WebView. This repo is still **Expo + React Native**; the recommended daily workflow is **`npx expo start`** (Expo Go or a dev build). Capacitor here only wraps the **Metro web export** so you can open the same UI in an **Xcode** project if you need that distribution path.
+
+**Important:** Many features rely on **native RN modules** (maps, `expo-camera`, `expo-secure-store`, etc.). In the **web** build those are limited or stubs — behavior will **not** match Expo on a real device until you reimplement flows with **Capacitor plugins** (e.g. `@capacitor/camera`, `@capacitor/preferences`) or a separate web UI.
+
+**One-time / when you change native deps:**
+
+```bash
+# From repo root — produces dist/index.html + bundles
+npm run build:web
+
+# Copy web assets into ios/ (and android/ if you added it)
+npx cap sync
+
+# Open Xcode (macOS)
+npm run cap:ios
+```
+
+If **`ios/`** is missing:
+
+```bash
+npx cap add ios
+# Optional: npx cap add android   (needs Android Studio / SDK)
+```
+
+Then **`npm run build:web && npx cap sync`** again. Always run **`build:web` before `cap sync`** so `dist/` contains `index.html`.
 
 ---
 

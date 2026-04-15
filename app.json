@@ -18,6 +18,14 @@
     },
     "web": {
       "bundler": "metro"
-    }
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "SmartCart uses the camera to photograph receipts for savings insights."
+        }
+      ]
+    ]
   }
 }

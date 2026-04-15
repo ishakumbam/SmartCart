@@ -37,7 +37,7 @@ export default function ScanScreen() {
         <Animated.View style={[styles.pulse, { borderColor: colors.primary, transform: [{ scale: ring }] }]} />
         <TouchableOpacity
           activeOpacity={0.86}
-          onPress={() => router.push('/scan/capture')}
+          onPress={() => router.push('/scan/camera')}
         >
           <LinearGradient colors={[colors.gradientA, colors.gradientB]} style={styles.capture}>
             <Ionicons name="camera" size={36} color="#fff" />

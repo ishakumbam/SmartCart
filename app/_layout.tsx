@@ -45,6 +45,7 @@ function RootNavigator() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="deal/[id]" />
         <Stack.Screen name="deal/directions" />
+        <Stack.Screen name="scan/camera" />
         <Stack.Screen name="scan/capture" />
         <Stack.Screen name="scan/upload" />
         <Stack.Screen name="settings/detail" />

@@ -40,6 +40,12 @@ export const receiptWorker = new Worker<ReceiptJob>(
       }
 
       const parsedItems = parseReceiptItems(rawText);
+      if (parsedItems.length === 0) {
+        throw new Error(
+          'No line items could be read from this receipt. Try a flatter, well-lit photo, or a longer edge-to-edge capture.',
+        );
+      }
+
       const storeName = detectStoreName(rawText);
       const totalAmount = detectTotalAmount(rawText);
 
