@@ -1,5 +1,6 @@
-# Blueprint: API is Node + Docker under server/ — not Elixir/Phoenix.
+# Blueprint: Node API in server/ (Docker). Do not use Elixir/Phoenix on Render.
 # https://render.com/docs/blueprint-spec
+# After apply, open the service → Environment and fill every sync: false key.
 services:
   - type: web
     name: smartcart-api
@@ -11,3 +12,25 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: CORS_ORIGIN
+        value: "*"
+      - key: OCR_ENGINE
+        value: tesseract
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: AWS_REGION
+        sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_S3_BUCKET
+        sync: false
+      - key: S3_ENDPOINT
+        sync: false

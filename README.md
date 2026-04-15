@@ -67,6 +67,8 @@ npm run dev
 
 The API listens on **`PORT`** (default **3000**). Health check: `GET /health`.
 
+**Free production deploy (Neon + Upstash + Render + R2):** see **[DEPLOY.md](./DEPLOY.md)** and `server/Dockerfile`.
+
 ### Database notes (macOS / Homebrew)
 
 Homebrew Postgres often uses your **macOS username** as the superuser, not `postgres`. Put the correct user (and password if any) in **`DATABASE_URL`**. If you use the provided Docker Compose file, start Docker Desktop, then:
