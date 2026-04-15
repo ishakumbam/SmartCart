@@ -1,0 +1,13 @@
+# Blueprint: API is Node + Docker under server/ — not Elixir/Phoenix.
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: smartcart-api
+    runtime: docker
+    dockerfilePath: ./server/Dockerfile
+    dockerContext: ./server
+    healthCheckPath: /health
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
