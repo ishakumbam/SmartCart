@@ -44,6 +44,21 @@ Render’s **free** web services **sleep** when idle (slow first request). Fine 
 
 **Avoid wrong stack:** Do **not** pick Elixir/Phoenix or any build command like `mix phx.digest`. This repo has **no `mix.exs`**. The API is **Node** under `server/`. Use **Docker** (below) or **Blueprint** from root `render.yaml`.
 
+### If logs still show Erlang / `mix phx.digest`
+
+That service was created as **Native Elixir**. Pushing code (including `render.yaml`) **does not change** an existing service’s runtime unless you use a **Blueprint** that owns that service.
+
+**Fix — create a new service (simplest):**
+
+1. [Render Dashboard](https://dashboard.render.com/) → **New +** → **Web Service** (not “from template” / not Phoenix).
+2. Connect **`SmartCart--Fintech`**, branch **`Isha-smartcart`**.
+3. **Runtime / Environment:** **Docker** (must not say Elixir or Erlang).
+4. **Dockerfile path:** `server/Dockerfile` · **Docker build context:** `server`.
+5. Clear **Build Command** and **Start Command** (Docker uses the image `CMD`).
+6. Re-add the same **Environment** variables as your old service, deploy, then open **`/health`**. Delete or stop the old Elixir service so you don’t redeploy the wrong one by mistake.
+
+**Fix — Blueprint:** **New +** → **Blueprint** → connect this repo. Render applies `render.yaml` and builds **`smartcart-api`** with Docker.
+
 1. Push this repo to GitHub.
 2. [Render Dashboard](https://dashboard.render.com/) → **New +** → **Web Service**.
 3. Connect the repo; set:
