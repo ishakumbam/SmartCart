@@ -2,7 +2,7 @@
 
 The **API** must run somewhere with **PostgreSQL**, **Redis**, and your **S3/R2** vars. The **Expo app** only needs `EXPO_PUBLIC_API_URL` pointing at that API.
 
-Below is a **$0-friendly** stack that works with this repo’s **`server/Dockerfile`**.
+Below is a **$0-friendly** stack. The production image is built from repo-root **`Dockerfile`** (context **`.`**); **`server/Dockerfile`** is the same layout for `docker build` with context **`server/`**.
 
 ---
 
@@ -53,9 +53,11 @@ That service was created as **Native Elixir**. Pushing code (including `render.y
 1. [Render Dashboard](https://dashboard.render.com/) → **New +** → **Web Service** (not “from template” / not Phoenix).
 2. Connect **`SmartCart--Fintech`**, branch **`Isha-smartcart`**.
 3. **Runtime / Environment:** **Docker** (must not say Elixir or Erlang).
-4. **Dockerfile path:** `server/Dockerfile` · **Docker build context:** `server`.
-5. Clear **Build Command** and **Start Command** (Docker uses the image `CMD`).
-6. Re-add the same **Environment** variables as your old service, deploy, then open **`/health`**. Delete or stop the old Elixir service so you don’t redeploy the wrong one by mistake.
+4. **Root Directory:** leave **empty** (repository root), unless you know what you are doing.
+5. **Dockerfile path:** `Dockerfile` · **Docker build context:** `.` (repo root).  
+   If you instead set **Root Directory** to `server`, use **`Dockerfile`** + context **`server`** (not `server/Dockerfile` — that path is wrong under a `server` root).
+6. Clear **Build Command** and **Start Command** (Docker uses the image `CMD`).
+7. Re-add the same **Environment** variables as your old service, deploy, then open **`/health`**. Delete or stop the old Elixir service so you don’t redeploy the wrong one by mistake.
 
 **Fix — Blueprint:** **New +** → **Blueprint** → connect this repo. Render applies `render.yaml` and builds **`smartcart-api`** with Docker.
 
@@ -63,8 +65,9 @@ That service was created as **Native Elixir**. Pushing code (including `render.y
 2. [Render Dashboard](https://dashboard.render.com/) → **New +** → **Web Service**.
 3. Connect the repo; set:
    - **Runtime:** Docker  
-   - **Dockerfile path:** `server/Dockerfile`  
-   - **Docker context:** `server` (same folder as the Dockerfile)
+   - **Root Directory:** empty (repo root)  
+   - **Dockerfile path:** `Dockerfile`  
+   - **Docker context:** `.` (repo root)
 4. **Instance type:** Free.
 5. **Environment** — add at least:
 

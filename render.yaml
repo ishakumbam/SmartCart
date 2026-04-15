@@ -5,8 +5,9 @@ services:
   - type: web
     name: smartcart-api
     runtime: docker
-    dockerfilePath: ./server/Dockerfile
-    dockerContext: ./server
+    # Repo root — avoids "Dockerfile: no such file" when Render root dir / paths are wrong.
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     healthCheckPath: /health
     plan: free
     envVars:

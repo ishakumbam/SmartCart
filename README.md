@@ -67,7 +67,7 @@ npm run dev
 
 The API listens on **`PORT`** (default **3000**). Health check: `GET /health`.
 
-**Free production deploy (Neon + Upstash + Render + R2):** see **[DEPLOY.md](./DEPLOY.md)** and `server/Dockerfile`.
+**Free production deploy (Neon + Upstash + Render + R2):** see **[DEPLOY.md](./DEPLOY.md)** and root **`Dockerfile`** (API in `server/`).
 
 ### Database notes (macOS / Homebrew)
 
